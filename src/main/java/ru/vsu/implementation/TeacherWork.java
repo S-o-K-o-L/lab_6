@@ -6,10 +6,7 @@ import ru.vsu.entity.Teacher;
 import ru.vsu.logic.TeacherService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TeacherWork implements TeacherService {
@@ -17,22 +14,45 @@ public class TeacherWork implements TeacherService {
     public List<String> getSingleSubjectLecturerFio(Collection<Teacher> teachers) {
         return teachers.stream()
                 .filter(teacher -> teacher.getSubjects().size() == 1)
-                .map(teacher -> teacher.getFullName())
+                .map(Teacher::getFullName)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Map<String, List<Student>> getTeacherNameToSupervisedStudentsMap(Collection<Student> students) {
-        return null;
+        Map<String, List<Student>> teacherStudents = new HashMap<>();
+        students.stream()
+                .filter(student -> student.getSupervisor() != null)
+                .forEach(student -> {
+                    if (!teacherStudents.containsKey(student.getSupervisor().getFullName())) {
+                        List<Student> listOfStudents = new ArrayList<>();
+                        listOfStudents.add(student);
+                        teacherStudents.put(student.getSupervisor().getFullName(), listOfStudents);
+                    } else {
+                        teacherStudents.get(student.getSupervisor().getFullName())
+                                .add(student);
+                    }
+                });
+        teacherStudents.values().stream()
+                .forEach(list ->
+                        list.sort(Comparator.comparing(Student::getLastName)));
+        return teacherStudents;
     }
 
     @Override
     public BigDecimal getTeachersSalarySum(Collection<Teacher> teachers) {
-        return null;
+        return teachers.stream()
+                .map(Teacher::getSalary)
+                .reduce(BigDecimal::add)
+                .orElseThrow();
     }
 
     @Override
     public String findTeacherBySubject(Collection<Teacher> teachers, Subject subject) {
-        return null;
+        return teachers.stream()
+                .filter(teacher1 -> teacher1.getSubjects().contains(subject))
+                .findFirst()
+                .map(Teacher::getFullName)
+                .orElse(null);
     }
 }

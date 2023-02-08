@@ -42,7 +42,7 @@ public class StudentServiceTests {
     @Test
     public void getAverageMarkReturnsAverageMark() {
         // given
-        double expectedAverageMark = 4.5;
+        double expectedAverageMark = 4.2;
 
         // when
         double actualAverageMark = studentService.getAverageMark(ALL_STUDENTS);

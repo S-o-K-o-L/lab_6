@@ -13,21 +13,21 @@ public class TestReflectionUtils {
         throw new RuntimeException();
     }
 
-    public static <T> T findImplementationOf(Class<T> interfaseType) {
-        Objects.requireNonNull(interfaseType);
-        if (interfaseType.isInterface()) {
+    public static <T> T findImplementationOf(Class<T> interfaceType) {
+        Objects.requireNonNull(interfaceType);
+        if (interfaceType.isInterface()) {
             try {
                 Reflections reflections = new Reflections(
                         new ConfigurationBuilder()
                                 .forPackage("ru.vsu")
                                 .setScanners(Scanners.SubTypes));
 
-                Class<? extends T> inplementationClass = reflections.getSubTypesOf(interfaseType)
+                Class<? extends T> implementationClass = reflections.getSubTypesOf(interfaceType)
                         .stream()
                         .findFirst()
                         .orElseThrow(() -> new NoSuchElementException("Implementation not found"));
 
-                return inplementationClass.getConstructor().newInstance();
+                return implementationClass.getConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new RuntimeException();
             }
